@@ -47,10 +47,6 @@ class ProviderHandler:
         """
         Retrieves a list of providers from the database.
 
-        This method connects to the specified database, retrieves all documents
-        from the 'providers' collection, closes the database connection, and 
-        converts the result into a list of Provider objects.
-
         Returns:
             list[Provider]: A list of Provider objects retrieved from the database.
         """
