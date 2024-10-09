@@ -56,7 +56,6 @@ class ProviderHandler:
         """
         db = self.connection[self.db_name]
         result = db.providers.find()
-        db.client.close()
         resultDict = list(result)
         return Provider.bulk_from_dict(resultDict)
     
@@ -71,8 +70,8 @@ class ProviderHandler:
             Provider: The provider object corresponding to the given ID.
         """
         db = self.connection[self.db_name]
-        result = db.providers.find_one({'_id': provider_id})
-        db.client.close()
+        return db.providers.find_one({'_id': provider_id})
+        
     
     def addProvider(self, provider: Provider) -> InsertOneResult:
         """
@@ -85,7 +84,7 @@ class ProviderHandler:
             InsertOneResult: The result of the insert operation.
         """
         db = self.connection[self.db_name]
-        return db.providers.insert_one(provider)
+        return db.providers.insert_one(provider.to_dict())
     
     def updateProvider(self, provider_id, provider: Provider) -> UpdateResult:
         """
@@ -99,7 +98,7 @@ class ProviderHandler:
             UpdateResult: The result of the update operation, including details such as the number of documents matched and modified.
         """
         db = self.connection[self.db_name]
-        return db.providers.update_one({'_id': provider_id}, {'$set': provider})
+        return db.providers.update_one({'_id': provider_id}, {'$set': provider.to_dict()})
     
     def deleteProvider(self, provider_id) -> UpdateResult:
         """
