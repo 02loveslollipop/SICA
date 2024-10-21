@@ -1,6 +1,4 @@
-from flask import jsonify
 from pymongo import MongoClient
-import pymongo
 from user import User
 from pymongo.results import InsertOneResult, UpdateResult
 from pymongo.server_api import ServerApi
@@ -17,32 +15,38 @@ class UserHandler:
 
     def userRegister(self,user: User) -> InsertOneResult:
         db = self.connection[self.db_name]
-        return db.users.insert_one(user.to_dict())
+        validate = db.users.find_one({'username': user.username})
+        if validate is not None:
+            return False
+        return db.users.insert_one(user.to_dict()).acknowledged
 
 
     def getUsers(self) -> list[User]:
         db = self.connection[self.db_name]
-
         result = db.users.find({'_isActive': True})	
-    
         resultDict = list(result)
-    
         return User.bulk_from_dict(resultDict)
     
     def getUserByID(self, user_id) -> User:
         db = self.connection[self.db_name]
         user_id_object = ObjectId(user_id)
-        response = db.users.find_one({'_id': user_id_object})
-        return response
+        return db.users.find_one({'_id': user_id_object})
         
     def updateUser(self, user_id, user: User) -> UpdateResult:
         db = self.connection[self.db_name]
-        return db.user.update_one({'_id': user_id}, {'$set': user.to_dict()})
-    
+        user_id_object = ObjectId(user_id)
+        userJson = user.to_dict()
+        userJson['_id'] = user_id_object
+        print(userJson)
+        result = db.users.update_one({'_id': user_id_object}, {'$set': userJson})
+        if result.modified_count > 0:
+            return {'message': 'User updated successfully', 'updated_count': result.modified_count}
+        else:
+            return {'message': 'No user was updated', 'updated_count': result.modified_count}
+
+
     def deleteUser(self, user_id) -> UpdateResult:
         db = self.connection[self.db_name]
-        return db.user.update_one({'_id': user_id}, {'$set': {'_isActive': False}})
+        user_id_object = ObjectId(user_id)
+        return db.users.update_one({'_id': user_id_object}, {'$set': {'_isActive': False}})
     
-    def __del__(self) -> None:
-
-        self.connection.close() 

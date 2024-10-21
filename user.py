@@ -1,5 +1,4 @@
 class User :
-    # bcrypt?
 
     @staticmethod
     def bulk_from_dict(data: dict) -> list['User']:
@@ -9,7 +8,7 @@ class User :
         self.username = username
         self.password = password
         self.role = role
-        self.id = _id
+        self._id = _id
         self.isActive = _isActive
 
     def to_dict(self) -> dict:
