@@ -15,17 +15,14 @@ class UserHandler:
 
     def userRegister(self,user: User) -> InsertOneResult:
         db = self.connection[self.db_name]
-        validate = db.users.find_one({'username': user.username})
-        if validate is not None:
-            return False
         return db.users.insert_one(user.to_dict()).acknowledged
 
 
     def getUsers(self) -> list[User]:
         db = self.connection[self.db_name]
         result = db.users.find({'_isActive': True})	
-        resultDict = list(result)
-        return User.bulk_from_dict(resultDict)
+        result = list(result)
+        return User.bulk_from_dict(result)
     
     def getUserByID(self, user_id) -> User:
         db = self.connection[self.db_name]
