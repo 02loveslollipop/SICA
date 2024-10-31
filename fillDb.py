@@ -9,6 +9,7 @@ from provider import Provider
 from sale import Sale
 from secret import Secret
 import datetime
+import os
 
 def create_test_data() -> None:
     # Initialize handlers with the database name and URI
@@ -91,4 +92,5 @@ def generate_sales(n: int) -> None:
 
 if __name__ == '__main__':
     #create_test_data()
-    generate_sales(89)
+    n = int(os.sys.argv[1])
+    generate_sales(n)
