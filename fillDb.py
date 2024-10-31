@@ -10,7 +10,7 @@ from sale import Sale
 from secret import Secret
 import datetime
 
-def create_test_data():
+def create_test_data() -> None:
     # Initialize handlers with the database name and URI
     secret = Secret()
     db_name = secret.dbName
@@ -55,5 +55,40 @@ def create_test_data():
     for sale in sales:
         sale_handler.makeSale(sale.id_seller, sale.id_client, sale.products, sale.date)
 
+def generate_sales(n: int) -> None:
+    # Initialize handlers with the database name and
+    secret = Secret()
+    db_name = secret.dbName
+    uri = secret.uri
+    mongo_client = MongoClient(uri)
+    sale_handler = SaleHandler(db_name=db_name, connection=mongo_client)
+    product_handler = ProductHandler(db_name=db_name, connection=mongo_client)
+    user_handler = UserHandler(db_name=db_name, connection=mongo_client)
+    provider_handler = ProviderHandler(db_name=db_name, connection=mongo_client)
+
+    # Get all products
+    products = product_handler.getProducts()
+    # Get all users
+    users = user_handler.getUsers()
+    
+    # Create n sales
+    for i in range(n):
+        # Randomly select a seller and a client
+        seller = users[i % len(users)]
+        client = users[(i + 1) % len(users)]
+        # Randomly select a number of products to buy
+        num_products = i % len(products) + 1
+        # Randomly select products to buy
+        products_to_buy = []
+        for j in range(num_products):
+            product = products[j]
+            quantity = (j + 1) * 5
+            products_to_buy.append({'idProducto': product._id, 'quantity': quantity})
+        # Randomly select a date
+        date = datetime.datetime.now().isoformat()
+        # Make the sale
+        sale_handler.makeSale(seller._id, client._id, products_to_buy, date)
+
 if __name__ == '__main__':
-    create_test_data()
+    #create_test_data()
+    generate_sales(89)
