@@ -10,6 +10,7 @@ from sale import Sale
 from secret import Secret
 import datetime
 import os
+import random
 
 def create_test_data() -> None:
     # Initialize handlers with the database name and URI
@@ -86,7 +87,7 @@ def generate_sales(n: int) -> None:
             quantity = (j + 1) * 5
             products_to_buy.append({'idProducto': product._id, 'quantity': quantity})
         # Randomly select a date
-        date = datetime.datetime.now().isoformat()
+        date = datetime.datetime(2024, random.randint(1, 12), random.randint(1, 28), random.randint(0, 23), random.randint(0, 59), random.randint(0, 59)).isoformat()
         # Make the sale
         sale_handler.makeSale(seller._id, client._id, products_to_buy, date)
 
