@@ -37,7 +37,7 @@ class ProductHandler:
         product_id_object = ObjectId(product_id)
         productJson = product.to_dict()
         productJson['_id'] = product_id_object
-        print(productJson)
+        #print(productJson)
         result = db.products.update_one({'_id': product_id_object}, {'$set': productJson})
         if result.modified_count > 0:
             return {'message': 'Products updated successfully', 'updated_count': result.modified_count}
@@ -49,8 +49,4 @@ class ProductHandler:
         db = self.connection[self.db_name]
         product_id_object = ObjectId(product_id)
         return db.products.update_one({'_id': product_id_object}, {'$set': {'_isActive': False}})
-    
-    
-
-
     
