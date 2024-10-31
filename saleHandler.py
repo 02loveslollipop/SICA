@@ -1,5 +1,6 @@
 from sale import Sale
 from pymongo import MongoClient
+from datetime import datetime
 
 class SaleHandler:
 
@@ -16,9 +17,9 @@ class SaleHandler:
         sales = saleConn.find()
         return [Sale.from_dict(sale) for sale in sales]
     
-    def getSalesByDate(self, date: str) -> list[dict]:
+    def getSalesByDate(self, dateLo: datetime , dateHi: datetime) -> list[dict]:
         saleConn = self.conn.sales
-        sales = saleConn.find({'date': date})
+        sales = saleConn.find({'date': {'$gte': dateLo, '$lte': dateHi}})
         return [Sale.from_dict(sale) for sale in sales]
     
     def getSalesByUser(self, user_id: int) -> list[dict]:
@@ -31,7 +32,9 @@ class SaleHandler:
         productReceiptDetails = []
         for product in products:
             productResult = self.conn.products.find_one({'_id': product['idProducto']})
-            if (productPrice := productResult.get('price')) is None:
+            print(productResult)
+            productResult = dict(productResult)
+            if (productPrice := productResult['price']) is None:
                 return {'error': f'Product {product["idProducto"]} not found'}
             total += productPrice * product['quantity']
             productReceiptDetails.append({
