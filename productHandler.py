@@ -3,6 +3,7 @@ from product import Product
 from pymongo.results import InsertOneResult, UpdateResult
 from pymongo.server_api import ServerApi
 from bson import ObjectId
+from exceptions import ProductNotFoundException
 
 class ProductHandler:
 
@@ -30,7 +31,10 @@ class ProductHandler:
     def getProductByID(self, product_id) -> Product:
         db = self.connection[self.db_name]
         product_id_object = ObjectId(product_id)
-        return db.products.find_one({'_id': product_id_object})
+        result = db.products.find_one({'_id': product_id_object})
+        if result is None:
+            raise ProductNotFoundException(f"Product with id {product_id} not found")
+        return result
         
     def updateProduct(self, product_id, product: Product) -> UpdateResult:
         db = self.connection[self.db_name]

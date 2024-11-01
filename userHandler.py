@@ -3,6 +3,7 @@ from user import User
 from pymongo.results import InsertOneResult, UpdateResult
 from pymongo.server_api import ServerApi
 from bson import ObjectId
+from exceptions import UserNotFoundException
 
 class UserHandler:
 
@@ -27,7 +28,10 @@ class UserHandler:
     def getUserByID(self, user_id) -> User:
         db = self.connection[self.db_name]
         user_id_object = ObjectId(user_id)
-        return db.users.find_one({'_id': user_id_object})
+        result = db.users.find_one({'_id': user_id_object})
+        if result is None:
+            raise UserNotFoundException(f"User with id {user_id} not found")
+        return result
         
     def updateUser(self, user_id, user: User) -> UpdateResult:
         db = self.connection[self.db_name]
