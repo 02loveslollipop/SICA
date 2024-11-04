@@ -22,6 +22,11 @@ class SaleHandler:
         sales = saleConn.find({'date': {'$gte': dateLo, '$lte': dateHi}})
         return [Sale.from_dict(sale) for sale in sales]
     
+    def getSaleByProduct(self, product_id: int) -> list[dict]:
+        saleConn = self.conn.sales
+        sales = saleConn.find({'products.idProducto': product_id})
+        return [Sale.from_dict(sale) for sale in sales]
+    
     def getSalesByUser(self, user_id: int) -> list[dict]:
         saleConn = self.conn.sales
         sales = saleConn.find({'user_id': user_id})

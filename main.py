@@ -126,15 +126,24 @@ def getProduct(id):
     
 @app.route('/product/<id>', methods=['PUT'])
 @login_required
-def updateProduct(id): #TODO: Add validation for the request to only update only the fields that are present in the request
+def updateProduct(id):
     try:
         data = request.json
-        name = data.get('name')
-        description = data.get('description')
-        category = data.get('category')
-        price = data.get('price')
-        status = data.get('status')
-        quantity = data.get('quantity')
+        currentData = mongo[config.mongo_db].products.find_one({'_id': ObjectId(id)})
+        if currentData is None:
+            return jsonify({'error': 'Product not found'}), 404
+        if name := data.get('name') is None:
+            name = currentData['name']
+        if description := data.get('description') is None:
+            description = currentData['description']
+        if category := data.get('category') is None:
+            category = currentData['category']
+        if price := data.get('price') is None:
+            price = currentData['price']
+        if status := data.get('status') is None:
+            status = currentData['status']
+        if quantity := data.get('quantity') is None:
+            quantity = currentData['quantity']
         product = Product(name, description, category, price, status, quantity)
         productHandler.updateProduct(id, product)
         return jsonify({'message': 'Product updated'}), 200
@@ -200,10 +209,11 @@ def getSalesByDate():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/sale/product/<id>', methods=['GET'])
-@login_required #TODO: Implement this
+@login_required
 def getSalesByProduct(id):
     try:
-        return jsonify({'message': 'Not implemented'}), 501
+        result = saleHandler.getSaleByProduct(id)
+        return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
@@ -328,10 +338,27 @@ def getUser(id):
         return jsonify({'error': str(e)}), 500
     
 @app.route('/user/<id>', methods=['PUT'])
-@login_required #TODO: Implement this
+@login_required 
 def updateUser(id):
     try:
-        return jsonify({'message': 'Not implemented'}), 501
+        currentData = mongo[config.mongo_db].users.find_one({'_id': ObjectId(id)})
+        data = request.get_json()
+        if currentData is None:
+            return jsonify({'error': 'User not found'}), 404
+        if name := data.get('name') is None:
+            name = currentData['name']
+        if lastname := data.get('lastname') is None:
+            lastname = currentData['lastname']
+        if email := data.get('email') is None:
+            email = currentData['email']
+        if cellphone := data.get('cellphone') is None:
+            cellphone = currentData['cellphone']
+        if password := data.get('password') is None:
+            password = currentData['password']
+        if role := data.get('role') is None:
+            role = currentData['role']
+        user = User(name, lastname, email, cellphone, password, role)
+        userHandler.updateUser(id, user)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
