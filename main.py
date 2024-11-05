@@ -1612,6 +1612,26 @@ def deleteUser(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+#add root endpoint so Cloudflare is happy
+@app.route('/')
+def root():
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>SICA API</title>
+    </head>
+    <body>
+
+        <h1>SICA API</h1>
+        <p>the EC2 is working and the api is available. Hopefully...</p>
+
+        <iframe style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&controls=0&mute=0" title="YouTube video player" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+    </body>
+    </html>
+    """
+    return html
+
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         print('Running in dev mode')
