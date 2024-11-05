@@ -51,3 +51,10 @@ class UserHandler:
         user_id_object = ObjectId(user_id)
         return db.users.update_one({'_id': user_id_object}, {'$set': {'_isActive': False}})
     
+    def getUserRole(self, email) -> str:
+        db = self.connection[self.db_name]
+        user = db.users.find_one({'email': email})
+        if user is None:
+            raise UserNotFoundException(f"User with email {email} not found")
+        else:
+            return user['role']

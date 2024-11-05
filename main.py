@@ -382,7 +382,83 @@ def logout():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/role/<email>', methods=['GET'])
+@login_required
+def getRole(email):
+    """Get user role by email
+    ---
+    parameters:
+        -   in: header
+            name: X-Access-Token
+            required: true
+            type: string
+            description: Access token
+            example: d2bd959809159bc15e26de7a01e7e58750bf8537b9381b32069d6e2017310d57
+        -   in: path
+            name: email
+            required: true
+            type: string
+            description: User email
+            example: test@test.com
+    responses:
+        200:
+            description: User role
+            schema:
+            type: object
+            properties:
+                role:
+                type: string
+                description: User role
+            example:
+                role: admin
+        404:
+            description: User not found
+            schema:
+            type: object
+            properties:
+                error:
+                type: string
+                description: Error message
+            example:
+                error: User not found
+        400:
+            description: Invalid request
+            schema:
+            type: object
+            properties:
+                error:
+                type: string
+                description: Error message
+            example:
+                error: Invalid request
+        500:
+            description: Internal server error
+            schema:
+            type: object
+            properties:
+                error:
+                type: string
+                description: Error message
+            example:
+                error: Internal server error
+    """
+    try:
+        if email is None:
+            return jsonify({'error': 'Invalid request'}), 400
+        role = userHandler.getUserRole(email)
+        return jsonify({'role': role}), 200
+    except UserNotFoundException:
+        return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+    
+
+
+
 # Product endpoints
+
+
 
 @app.route('/product', methods=['GET'])
 @login_required
