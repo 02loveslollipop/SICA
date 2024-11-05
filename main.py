@@ -165,6 +165,7 @@ Endpoints:
         - 404: { "error": "User not found" }
         - 500: { "error": "Internal server error" }
 """
+import sys
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -1612,4 +1613,15 @@ def deleteUser(id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        print('Running in dev mode')
+        app.run(host='0.0.0.0', port=5000, debug=True)
+    
+    elif sys.argv[1] == 'https':
+        print('Running dev with https')
+        app.run(host='0.0.0.0' , port=443, ssl_context='adhoc', debug=True)
+    elif sys.argv[1] == 'prod':
+        print('Running in production mode')
+        app.run(host='0.0.0.0', port=443, ssl_context=('cert.pem', 'key.pem'))
+    
     app.run(host='0.0.0.0', port=5000)
