@@ -203,10 +203,10 @@ if __name__ == '__main__':
         app.run(debug=True, port=5000, host='0.0.0.0')
     elif sys.argv[1] == 'https':
         print('Running dev with https')
-        app.run(port=8080, host='0.0.0.0', ssl_context='adhoc', debug=True)
+        app.run(port=443, host='0.0.0.0', ssl_context='adhoc', debug=True)
     elif sys.argv[1] == 'prod':
         print('Running in production mode')
-        app.run(port=8080, host='0.0.0.0', ssl_context='adhoc', debug=False)
+        app.run(port=443, host='0.0.0.0', ssl_context='adhoc', debug=False)
     elif len(sys.argv) == 3 and sys.argv[1] == 'test':
         port = int(sys.argv[2])
         print(f'Running in production test at port {port}')
