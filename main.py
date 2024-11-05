@@ -1613,15 +1613,14 @@ def deleteUser(id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 1:
         print('Running in dev mode')
         app.run(host='0.0.0.0', port=5000, debug=True)
-    
     elif sys.argv[1] == 'https':
         print('Running dev with https')
         app.run(host='0.0.0.0' , port=443, ssl_context='adhoc', debug=True)
     elif sys.argv[1] == 'prod':
         print('Running in production mode')
-        app.run(host='0.0.0.0', port=443, ssl_context=('cert.pem', 'key.pem'))
+        app.run(host='0.0.0.0', port=443, ssl_context='adhoc')
     
     app.run(host='0.0.0.0', port=5000)
