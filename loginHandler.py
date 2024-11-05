@@ -19,8 +19,8 @@ class LoginHandler:
         user = db.users.find_one({'email': login.email})
         if user is None:
             return False
-        password = login.password.encode('utf-8')
-        if bcrypt.checkpw(password, user['password']):
+        password = login.password
+        if password == user['password']:
             return True
         else:
             return False

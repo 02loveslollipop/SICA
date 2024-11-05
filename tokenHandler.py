@@ -10,6 +10,7 @@ class TokenHandler:
         self.secret = secret
         self.ttl = ttl
         self.mongoConnect = connection
+        self.db = db
     
     def generate(self, user: str) -> dict:
         token = hashlib.sha256(f'{user}{str(datetime.datetime.now())}'.encode("utf-8")).hexdigest()

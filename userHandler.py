@@ -23,7 +23,7 @@ class UserHandler:
         db = self.connection[self.db_name]
         result = db.users.find({'_isActive': True})	
         result = list(result)
-        return User.bulk_from_dict(result)
+        return result
     
     def getUserByID(self, user_id) -> User:
         db = self.connection[self.db_name]

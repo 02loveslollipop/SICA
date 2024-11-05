@@ -188,6 +188,7 @@ from product import Product
 from secret import Secret
 from provider import Provider
 from flasgger import Swagger
+import traceback
 
 template = {
   "info": {
@@ -222,7 +223,7 @@ def login_required(f):
             if token is None:
                 return jsonify({'error': 'Token not found'}), 400
             
-            if not loginHandler.authToken(token):
+            if not tokenHandler.auth(token):
                 return jsonify({'error': 'Invalid token'}), 401
         except KeyError:
             return jsonify({'error': 'Token not found'}), 400
@@ -313,6 +314,7 @@ def login():
     except KeyError:
         return jsonify({'error': 'Invalid request'}), 400
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route('/logout', methods=['POST'])
@@ -442,8 +444,9 @@ def getProducts():
     """
     try:
         products = productHandler.getProducts()
-        return jsonify(products), 200
+        return dumps(products), 200
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
     
 @app.route('/product', methods=['POST'])
@@ -512,11 +515,12 @@ def addProduct():
         status = data.get('status')
         quantity = data.get('quantity')
         product = Product(name, description, category, price, status, quantity)
-        productHandler.addProduct(product)
+        productHandler.productRegister(product)
         return jsonify({'message': 'Product added'}), 201
     except ValueError:
         return jsonify({'error': 'Invalid request'}), 400
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
     
 @app.route('/product/<id>', methods=['GET'])
@@ -565,10 +569,11 @@ def getProduct(id):
     """
     try:
         product = productHandler.getProductByID(id)
-        return jsonify(product), 200
+        return dumps(product), 200
     except ProductNotFoundException:
         return jsonify({'error': 'Product not found'}), 404
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
     
 @app.route('/product/<id>', methods=['PUT'])
@@ -606,7 +611,7 @@ def updateProduct(id):
     """
     try:
         data = request.json
-        currentData = mongo[config.mongo_db].products.find_one({'_id': ObjectId(id)})
+        currentData = mongo[config.dbName].products.find_one({'_id': ObjectId(id)})
         if currentData is None:
             return jsonify({'error': 'Product not found'}), 404
         if name := data.get('name') is None:
@@ -629,6 +634,7 @@ def updateProduct(id):
     except ProductNotFoundException:
         return jsonify({'error': 'Product not found'}), 404
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route('/product/<id>', methods=['DELETE'])
@@ -749,7 +755,7 @@ def getSales():
     """
     try:
         sales = saleHandler.getSales()
-        return jsonify(sales), 200
+        return dumps(sales), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
@@ -815,11 +821,12 @@ def generateSale():
         products = data.get('products')
         if date := data.get('date') is None:
             date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        saleHandler.makeSale(id_seller, id_client, products, date)
-        return jsonify({'message': 'Sale generated'}), 201
+        result = saleHandler.makeSale(id_seller, id_client, products, date)
+        return jsonify({'message': 'Sale generated'}), 201 #return dumps(result), 201
     except ValueError:
         return jsonify({'error': 'Invalid request'}), 400
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
     
 @app.route('/sale/date', methods=['GET'])
@@ -878,10 +885,11 @@ def getSalesByDate():
         dateLo = request.args.get('dateLo')
         dateHi = request.args.get('dateHi')
         sales = saleHandler.getSalesByDate(dateLo, dateHi)
-        return jsonify(sales), 200
+        return dumps(sales), 200
     except ValueError:
         return jsonify({'error': 'Could not parse dates from request'}), 400
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route('/sale/product/<id>', methods=['GET'])
@@ -1015,7 +1023,7 @@ def getProviders():
     """
     try:
         providers = providerHandler.getProviders()
-        return jsonify(providers), 200
+        return dumps(providers), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -1207,13 +1215,13 @@ def updateProvider(id):
     """
     try:
         data = request.get_json()
-        request = mongo[config.mongo_db].providers.find_one({'_id': ObjectId(id)})
-        if request is None:
+        mongorequest = mongo[config.dbName].providers.find_one({'_id': ObjectId(id)})
+        if mongorequest is None:
             return jsonify({'error': 'Provider not found'}), 404
         if name := data.get('name') is None:
-            name = request['name']
+            name = mongorequest['name']
         if address := data.get('address') is None:
-            address = request['address']
+            address = mongorequest['address']
         provider = Provider(name, address)
         providerHandler.updateProvider(id, provider)
         return jsonify({'message': 'Provider updated'}), 200
@@ -1222,6 +1230,7 @@ def updateProvider(id):
     except ProviderNotFoundException:
         return jsonify({'error': 'Provider not found'}), 404
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
     
 @app.route('/provider/<id>', methods=['DELETE'])
@@ -1341,8 +1350,9 @@ def getUsers():
     """
     try:
         users = userHandler.getUsers()
-        return jsonify(users), 200
+        return dumps(users), 200
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route('/user', methods=['POST'])
@@ -1411,11 +1421,12 @@ def addUser():
         password = data.get('password')
         role = data.get('role')
         user = User(name, lastname, email, cellphone, password, role)
-        userHandler.addUser(user)
+        userHandler.userRegister(user)
         return jsonify({'message': 'User added'}), 201
     except ValueError:
         return jsonify({'error': 'Invalid request'}), 400
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
         
 @app.route('/user/<id>', methods=['GET'])
@@ -1464,10 +1475,11 @@ def getUser(id):
     """
     try:
         user = userHandler.getUserByID(id)
-        return jsonify(user), 200
+        return dumps(user), 200
     except UserNotFoundException:
         return jsonify({'error': 'User not found'}), 404
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
     
 @app.route('/user/<id>', methods=['PUT'])
@@ -1531,7 +1543,7 @@ def updateUser(id):
                 error: Internal server error
     """
     try:
-        currentData = mongo[config.mongo_db].users.find_one({'_id': ObjectId(id)})
+        currentData = mongo[config.dbName].users.find_one({'_id': ObjectId(id)})
         data = request.get_json()
         if currentData is None:
             return jsonify({'error': 'User not found'}), 404

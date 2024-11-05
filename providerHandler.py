@@ -4,6 +4,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from pymongo.results import InsertOneResult, UpdateResult
 from exceptions import ProviderNotFoundException
+from bson import ObjectId
 
 class ProviderHandler:
     """
@@ -55,7 +56,7 @@ class ProviderHandler:
         db = self.connection[self.db_name]
         result = db.providers.find()
         resultDict = list(result)
-        return Provider.bulk_from_dict(resultDict)
+        return resultDict
     
     def getProviderByID(self, provider_id) -> Provider:
         """
@@ -68,7 +69,8 @@ class ProviderHandler:
             Provider: The provider object corresponding to the given ID.
         """
         db = self.connection[self.db_name]
-        result = db.providers.find_one({'_id': provider_id})
+        
+        result = db.providers.find_one({'_id': ObjectId(provider_id)})
         if result is None:
             raise ProviderNotFoundException(f"Provider with id {provider_id} not found")
         

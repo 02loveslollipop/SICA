@@ -26,7 +26,7 @@ class ProductHandler:
         db = self.connection[self.db_name]
         result = db.products.find({'_isActive': True})	
         resultDict = list(result)
-        return Product.bulk_from_dict(resultDict)
+        return resultDict
     
     def getProductByID(self, product_id) -> Product:
         db = self.connection[self.db_name]
