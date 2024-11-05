@@ -188,6 +188,19 @@ from secret import Secret
 from provider import Provider
 from flasgger import Swagger
 
+template = {
+  "info": {
+    "title": "SICA-API",
+    "description": "Backend of SICA",
+    "version": "1.0.0",
+    "contact": {
+        "email": "support@02loveslollipop.uk",
+        "url": "https://github.com/02loveslollipop"
+    },
+    "host": "sica.02loveslollipop.uk"    
+  }
+}
+
 app = Flask(__name__)
 cors = CORS(app)
 config = Secret()
@@ -198,7 +211,7 @@ userHandler = UserHandler(config.dbName, connection=mongo)
 productHandler = ProductHandler(config.dbName, connection=mongo)
 loginHandler = LoginHandler(config.dbName, connection=mongo)
 tokenHandler = TokenHandler(config.token_ttl, config.secret, mongo, config.dbName)
-swagger = Swagger(app)
+swagger = Swagger(app, template=template)
 
 def login_required(f):
     @wraps(f)
