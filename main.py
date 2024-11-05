@@ -1642,6 +1642,10 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'prod':
         print('Running in production mode')
         app.run(host='0.0.0.0', port=443, ssl_context=('cert.pem', 'key.pem'))
+    elif len(sys.argv) == 3:
+        port = int(sys.argv[2])
+        print(f'Running in production test at port {port}')
+        app.run(host='0.0.0.0', port=port, ssl_context=('cert.pem', 'key.pem'))
     else:
         print('Running in dev mode')
         app.run(host='0.0.0.0', port=5000)
