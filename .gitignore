@@ -2,3 +2,5 @@ TODO
 secret
 test.py
 __pycache__/
+cert.pem
+key.pem
