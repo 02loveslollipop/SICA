@@ -3,8 +3,7 @@ import pandas as pd
 import plotly.express as px
 from secret import Secret
 from pymongo import MongoClient
-
-
+import sys
 
 """
 This script creates a Dash app that displays a table with the sales data and the products of the providers from the database.
@@ -199,4 +198,19 @@ app.layout = html.Div([
 ], style={'background-color': '#ffffff'})  # Set your desired background color here
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    if len(sys.argv) == 1:
+        print('Running in dev mode')
+        app.run(debug=True, port=5000, host='0.0.0.0')
+    elif sys.argv[1] == 'https':
+        print('Running dev with https')
+        app.run(port=8080, host='0.0.0.0', ssl_context='adhoc', debug=True)
+    elif sys.argv[1] == 'prod':
+        print('Running in production mode')
+        app.run(port=8080, host='0.0.0.0', ssl_context='adhoc', debug=False)
+    elif len(sys.argv) == 3 and sys.argv[1] == 'test':
+        port = int(sys.argv[2])
+        print(f'Running in production test at port {port}')
+        app.run(port=port, host='0.0.0.0', ssl_context='adhoc', debug=False)
+    else:
+        print('Running in dev mode')
+        app.run(debug=True, port=5000, host='0.0.0.0')
