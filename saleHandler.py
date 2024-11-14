@@ -51,8 +51,8 @@ class SaleHandler:
                 })
         saleConn = self.conn.sales
         saleConn.insert_one({
-            'id_seller': id_seller,
-            'id_client': id_client,
+            'id_seller': ObjectId(id_seller),
+            'id_client': ObjectId(id_client),
             'products': products,
             'date': date,
             'total': total
